@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen</title>
+  </head>
+  <body>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen - 100만원 결제 테스트</title>
+    
+    <!-- [중요] 토스페이먼츠 필수 보안 결제 라이브러리 로드 -->
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+    
+    <style>
+      /* 화면 정중앙 배치 및 배경 디자인 */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f6f7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      .payment-card {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .price-tag {
+        font-size: 32px;
+        font-weight: 800;
+        color: #e11d48;
+        margin: 15px 0 25px 0;
+      }
+      .btn-pay {
+        background-color: #0078ff;
+        color: white;
+        border: none;
+        padding: 18px 36px;
+        font-size: 20px;
+        font-weight: bold;
+        border-radius: 12px;
+        cursor: pointer;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 120, 255, 0.3);
+        transition: all 0.2s ease-in-out;
+      }
+      .btn-pay:hover {
+        background-color: #005ecb;
+        transform: translateY(-2px);
+      }
+      .btn-pay:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="payment-card">
+      <h2 style="margin: 0; color: #333;">프리미엄 정기 서비스</h2>
+      <div class="price-tag">1,000,000 원</div>
+      
+      <!-- 버튼 클릭 시 pay() 함수가 안정적으로 호출됩니다 -->
+      <button class="btn-pay" onclick="pay()">100만원 결제 및 카드 추가</button>
+    </div>
+
+    <script>
+      // 토스페이먼츠 공식 테스트용 클라이언트 키 (건드리지 마세요)
+      var clientKey = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
+      
+      // 혹시 라이브러리가 안 불러와졌을 때를 대비한 안전장치
+      var tossPayments;
+      try {
+          tossPayments = TossPayments(clientKey);
+      } catch (e) {
+          console.error("토스 SDK 로드 실패:", e);
+      }
+
+      function pay() {
+          if (!tossPayments) {
+              alert("결제 시스템을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+              return;
+          }
+
+          // 실제 카드 결제 및 카드 등록 팝업창 요청
+          tossPayments.requestPayment('카드', {
+              amount: 1000000, // 100만 원 결제 금액 설정
+              orderId: 'ORDER_' + new Date().getTime(), // 실시간 무작위 주문번호 생성
+              orderName: '100만원 결제 테스트 상품',
+              customerName: '일반고객',
+              successUrl: window.location.href, // 완료 후 현재 페이지로 안전하게 리다이렉트
+              failUrl: window.location.href,    // 실패 후 현재 페이지로 리다이렉트
+          }).catch(function (error) {
+              // 팝업 차단 등의 이유로 실패 시 에러 알림
+              if (error.code === 'USER_CANCEL') {
+                  alert('사용자가 결제창을 닫았습니다.');
+              } else {
+                  alert('결제창을 열 수 없습니다: ' + error.message);
+              }
+          });
+      }
+    </script>
+  </body>
+</html>
